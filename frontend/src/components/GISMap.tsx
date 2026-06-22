@@ -154,7 +154,8 @@ export const GISMap: React.FC<GISMapProps> = ({
           style={{ 
             opacity: smokeOpacity, 
             transform: `scale(${1 + windSpeed * 0.04})`,
-            transformOrigin: "0% 0%"
+            transformOrigin: "0% 0%",
+            pointerEvents: "none"
           }}
         />
 
@@ -173,7 +174,8 @@ export const GISMap: React.FC<GISMapProps> = ({
                 style={{
                   fill: hasSelectedStation ? "rgba(59, 130, 246, 0.08)" : zone.baseColor,
                   stroke: hasSelectedStation ? "var(--color-primary)" : zone.border,
-                  strokeWidth: hasSelectedStation ? 1.5 : 0.8
+                  strokeWidth: hasSelectedStation ? 1.5 : 0.8,
+                  pointerEvents: "none"
                 }}
               />
             );
@@ -186,7 +188,8 @@ export const GISMap: React.FC<GISMapProps> = ({
           style={{ 
             transform: `rotate(${windSvgAngle}deg)`, 
             transformOrigin: "250px 250px", 
-            transition: "transform 1s ease" 
+            transition: "transform 1s ease",
+            pointerEvents: "none"
           }}
         >
           <path d="M 50,100 L 450,100" className="wind-flow-line" style={{ animationDuration: `${12 / windSpeed}s` }} />

@@ -1,3 +1,13 @@
+---
+title: AI-Powered Urban Air Quality Intelligence for Smart City Intervention
+emoji: 🌬️
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Aero-Grid AI: Urban Air Quality Intelligence & Smart City Intervention Platform
 
 Aero-Grid AI is a full-stack smart city control room prototype designed for municipal and environmental enforcement authorities in the **Delhi National Capital Region (NCR)**. 

@@ -247,7 +247,7 @@ export const GISMap: React.FC<GISMapProps> = ({
                 />
                 
                 {/* Inner core circle */}
-                <circle r={isSelected ? 4 : 3} fill="#ffffff" />
+                <circle r={isSelected ? 4 : 3} fill="#ffffff" className="station-marker-core" />
                 
                 {/* Station Label text */}
                 <text

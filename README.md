@@ -22,9 +22,45 @@ Delhi NCR faces one of the most complex air quality challenges in the world. Whi
 1. **Vehicular Congestion**: Millions of idling engines at major junctions (like ITO and Dhaula Kuan) create localized hubs of high nitrogen oxides ($NO_x$) and fine particulate matter ($PM_{2.5}$).
 2. **Industrial Clusters**: Areas like Bawana house manufacturing units, boiler operations, and waste-incineration activities that emit sulfur dioxide ($SO_2$) and volatile compounds.
 3. **Seasonal Crop Residue Burning**: During winter, agricultural burning in neighboring Punjab and Haryana releases massive plumes of smoke.
-4. **Metereological Trapping**: When wind speeds drop and winter thermal inversions occur, cool air gets trapped close to the ground like a lid on a pot, locking all these emissions over the city. When North-West winds blow, they carry the stubble smoke directly into the heart of Delhi.
+4. **Meteorological Trapping**: When wind speeds drop and winter thermal inversions occur, cool air gets trapped close to the ground like a lid on a pot, locking all these emissions over the city. When North-West winds blow, they carry the stubble smoke directly into the heart of Delhi.
 
 Aero-Grid AI solves this by fusing live sensor data with weather patterns to tell administrators **where the pollution is coming from**, **what it will look like in 72 hours**, and **exactly where to send inspectors** to stop it.
+
+---
+
+## 📊 System Architecture
+
+```mermaid
+flowchart TD
+    subgraph DataFeeds["Multi-Modal Feeds (Simulated)"]
+        Sensors["Ground Telemetry (CAAQMS)"]
+        Satellite["Satellite MODIS (Crop Fire Counts)"]
+        Weather["IMD Weather Forecasts"]
+    end
+
+    subgraph BackendAgent["Python FastAPI Backend & AI Agents"]
+        Router["API Endpoint Router (main.py)"]
+        Attribution["Source Attribution Agent (Chemical Ratios)"]
+        Forecaster["Hyperlocal Predictive Forecaster"]
+        Enforcement["Enforcement Prioritization Engine"]
+    end
+
+    subgraph FrontendApp["React Dashboard (Aero-Grid UI)"]
+        Map["Interactive Vector GIS Map"]
+        Sandbox["What-If Policy Panel"]
+        Timeline["72h Forecast Scrubber Chart"]
+        Console["Enforcement Dispatch Panel"]
+        Advisory["Multi-lingual Health advisories"]
+    end
+
+    DataFeeds --> Router
+    Router --> Attribution & Forecaster & Enforcement
+    Attribution -->|GET /api/attribution| Map
+    Forecaster -->|POST /api/simulate| Timeline
+    Enforcement -->|GET /api/enforcement| Console
+    Sandbox -->|POST /api/simulate| Timeline
+    Timeline --> Advisory
+```
 
 ---
 
@@ -79,6 +115,42 @@ Sliders & Dispatch Cards                       using NumPy (Wind vectors,
 2. **Server Router (FastAPI)**: Serves as the communication bridge. It receives the parameters, validates them, and passes them to the math models.
 3. **Simulation Core (Python + NumPy)**: Performs calculations using dispersion math. It simulates how winds carry pollutants, how mixing heights trap smoke, and how policy reductions impact future AQI.
 4. **Single-Container Assembly (Docker)**: The frontend is compiled into static HTML/CSS files, which are hosted directly by the Python server. The entire app is packaged into a single container that runs on port `7860`.
+
+---
+
+## 📡 API Communication Flow
+
+The React frontend communicates with the FastAPI simulation server using four main REST endpoints:
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Admin as Control Room Panel (React)
+    participant API as FastAPI Backend (main.py)
+    participant Model as Simulation Engine (NumPy)
+
+    Note over Admin, API: 1. Load telemetry for all NCR sensors
+    Admin->>API: GET /api/stations
+    API->>Model: compute_aqi_components() (Baseline weather setup)
+    Model-->>API: Base AQI, PM2.5, PM10 values
+    API-->>Admin: JSON array of 6 stations with live coordinates
+
+    Note over Admin, API: 2. Calculate local chemical fingerprint & source ratios
+    Admin->>API: GET /api/attribution?station_id=anand_vihar&wind_speed=2.5&...
+    API->>Model: compute_aqi_components() (Apply current wind dispersion)
+    Model-->>API: Attributed percentages & particulate ratios
+    API-->>Admin: JSON: vehicular%, industrial%, biomass%, dust% + Chemical fingerprints
+
+    Note over Admin, API: 3. Run What-If Policy Simulation
+    Admin->>API: POST /api/simulate (Policies payload)
+    API->>Model: compute_aqi_components() (72h timeline: baseline vs. mitigated)
+    Model-->>API: 72-hour AQI projection timelines
+    API-->>Admin: JSON: Baseline timeline vs. Mitigated timeline coordinates
+
+    Note over Admin, API: 4. Retrieve Prioritized Enforcement Task Cards
+    Admin->>API: GET /api/enforcement
+    API-->>Admin: JSON array of hotspots, GPS coordinates, priority & recommended inspector actions
+```
 
 ---
 
